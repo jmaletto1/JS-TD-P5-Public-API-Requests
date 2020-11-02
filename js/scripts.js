@@ -116,7 +116,7 @@ $('.search-container').append(`
                             <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit"> 
                         </form>
                         `);
-                        // $(':input[type=submit]').prop('disabled', true);
+                        $(':input[type=submit]').prop('disabled', true).hide();
 
                     }
 $('.search-container').on('keyup submit', (e) => {
