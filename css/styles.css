@@ -11,6 +11,7 @@
 html, body {
     width: 100%;
     max-width: 100%;
+    background-image: url("../img/bg.jpg");
 }
 
 body {
@@ -30,7 +31,8 @@ header {
 
 header h1 {
     font-size: 1.25em;
-    color: rgba(50, 50, 50, 0.9);
+    /*color: rgba(50, 50, 50, 0.9);*/
+    color: #4d4dff;
     margin-top: 35px;
 }
 
@@ -106,6 +108,7 @@ header h1 {
 
 .card-name {
     margin: 20px auto 0;
+    color: #aa80ff;
 }
 
 .card-text {
@@ -166,6 +169,7 @@ header h1 {
 
 .modal-name {
     margin-bottom: 5px;
+    color: #aa80ff;
 }
 
 .modal-text {

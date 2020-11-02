@@ -54,28 +54,92 @@ window the user has open. This will be updated when the user closes or toggles t
 windows.
 */
 
-function insertHTML(data) {
+function insertHTML(data, search=false) {
+	if (search) {
+		search = search.toUpperCase();
+		searchResults = [];
+
+		for (let entry=0; entry<data.results.length; entry++) {
+			const firstName = data.results[entry].name.first.toUpperCase();
+			const lastName = data.results[entry].name.last.toUpperCase();
+
+			if (firstName.includes(search) || lastName.includes(search)) {
+				searchResults.push(data.results[entry]) }
+			}
+
+			for (let entry=0; entry<searchResults.length; entry++) {
+  		gallery.insertAdjacentHTML('beforeend', `<div class="card" id="${entry}">
+                    <div class="card-img-container">
+                        <img class="card-img" src="${searchResults[entry].picture.thumbnail}" alt="profile picture">
+                    </div>
+                    		 <div class="card-info-container">
+                        <h3 id="name" class="card-name cap">${searchResults[entry].name.first} ${searchResults[entry].name.last}</h3>
+                        <p class="card-text">${searchResults[entry].email}</p>
+                        <p class="card-text cap">${searchResults[entry].location.city}, ${searchResults[entry].location.state}</p>
+                    </div>
+                    
+                </div>`);
+
+  	}
+  	$('.card').on('click', (e) => {
+		let selected = e.target.closest('div.card').id;
+		currentModal = parseInt(selected);
+		 createModalWindow(searchResults, selected); 
+		});
+
+	} else {
+
 	for (let i=0; i<data.results.length; i++) {
   		users.push(data.results[i]);
   		gallery.insertAdjacentHTML('beforeend', `<div class="card" id="${i}">
                     <div class="card-img-container">
-                        <img class="card-img" src="${data.results[i].picture.thumbnail}" alt="profile picture">
+                        <img class="card-img" src="${users[i].picture.thumbnail}" alt="profile picture">
                     </div>
                     <div class="card-info-container">
-                        <h3 id="name" class="card-name cap">${data.results[i].name.first} ${data.results[i].name.last}</h3>
-                        <p class="card-text">${data.results[i].email}</p>
-                        <p class="card-text cap">${data.results[i].location.city}, ${data.results[i].location.state}</p>
+                        <h3 id="name" class="card-name cap">${users[i].name.first} ${users[i].name.last}</h3>
+                        <p class="card-text">${users[i].email}</p>
+                        <p class="card-text cap">${users[i].location.city}, ${users[i].location.state}</p>
                     </div>
                 </div>`);
 }
+
 $('.card').on('click', (e) => {
 		let selected = e.target.closest('div.card').id;
 		currentModal = parseInt(selected);
-		alert(currentModal);
-		 createModalWindow(data, selected); 
+		 createModalWindow(users, selected); 
 		});
 
+if (!search) {
+$('.search-container').append(`
+<form action="" method="get">
+                            <input type="search" id="search-input" class="search-input" placeholder="Search...">
+                            <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit"> 
+                        </form>
+                        `);
+                        // $(':input[type=submit]').prop('disabled', true);
+
+                    }
+$('.search-container').on('keyup submit', (e) => {
+	e.preventDefault()
+	$('#gallery').empty();
+	let searchValue = e.target.value;
+	insertHTML(data, searchValue);
+	if (!e.target.value) {
+		$('form:first-child').remove();
+		$('#search-input').focus();
+	}
+})
+$('.search-container').on('click', (e) => {
+	e.preventDefault()
+	if (e.target.value) {
+	$('#gallery').empty();
+		$('form:first-child').remove();
+		$('#search-input').focus();
+		insertHTML(data);
+	}
+})
 };
+}
 
 /*
 The createModalWindow function does exactly that - creates the modal window that
@@ -91,7 +155,7 @@ The modal window also has an eventListener that allows the window to be closed w
 */
 
 function createModalWindow(data, selected) {
-	let d = data.results[selected].dob.date;
+	let d = data[selected].dob.date;
 	let bDay = new Date(d);
 	let bDayMonth = bDay.getMonth();
 	bDayMonth += 1;
@@ -106,20 +170,20 @@ function createModalWindow(data, selected) {
 		bDayDate = "0" + bDayDate;
 	}
 
-	let displayBday = (bDayMonth) + "-" + bDayDate + "-" + bDay.getFullYear()
+	let displayBday = (bDayMonth) + "-" + bDayDate + "-" + bDay.getFullYear();
 
 	$('body').append(`<div class="modal-container">
 	                <div class="modal">
 	                    <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
 	                    <div class="modal-info-container">
-	                        <img class="modal-img" src="${data.results[selected].picture.thumbnail}" alt="profile picture">
-	                        <h3 id="name" class="modal-name cap">${data.results[selected].name.first} ${data.results[selected].name.last}</h3>
-	                        <p class="modal-text"><a href="mailto:${data.results[selected].email}">${data.results[selected].email}</a></p>
-	                        <p class="modal-text cap">${data.results[selected].location.city}</p>
+	                        <img class="modal-img" src="${data[selected].picture.thumbnail}" alt="profile picture">
+	                        <h3 id="name" class="modal-name cap">${data[selected].name.first} ${data[selected].name.last}</h3>
+	                        <p class="modal-text"><a href="mailto:${data[selected].email}">${data[selected].email}</a></p>
+	                        <p class="modal-text cap">${data[selected].location.city}</p>
 	                        <hr>
-	                        <p class="modal-text">${data.results[selected].phone}</p>
-	                        <p class="modal-text">${data.results[selected].location.street.number}
-	                        ${data.results[selected].location.street.name}, ${data.results[selected].location.state} ${data.results[selected].location.postcode}</p>
+	                        <p class="modal-text">${data[selected].phone}</p>
+	                        <p class="modal-text">${data[selected].location.street.number}
+	                        ${data[selected].location.street.name}, ${data[selected].location.state} ${data[selected].location.postcode}</p>
 	                        <p class="modal-text">${displayBday}</p>
 	                    </div>
 	                </div>
@@ -129,19 +193,25 @@ function createModalWindow(data, selected) {
                     <button type="button" id="modal-next" class="modal-next btn">Next</button>
                 </div>
             </div>`)
+
 	$('.modal-close-btn').on('click', () => {
 		$('.modal-container').hide();
-		currentModal = 0;
-		alert(currentModal);
+		$('.modal-container').remove();
 	})
 	$('#modal-prev').on('click', () => {
 		$('.modal-container').hide();
+		$('.modal-container').remove();
 		currentModal -= 1;
-		alert(currentModal);
+		if (currentModal >= 0 && currentModal <12 ) {
+		createModalWindow(data, currentModal);
+	}
 	})
 	$('#modal-next').on('click', () => {
 		$('.modal-container').hide();
+		$('.modal-container').remove();
 		currentModal += 1;
-		alert(currentModal);
+		if (currentModal >= 0 && currentModal <12 ) {
+		createModalWindow(data, currentModal);
+	}
 	})
 }
